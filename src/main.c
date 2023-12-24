@@ -65,8 +65,8 @@ void print_value(int16_t value){
 int16_t adc2current_ma(int16_t adc_value){
 	// Да, на AVR нет FPU и операции с float медленные, но операции с int32_t не быстрее, а делать математику с int16_t больно и бессмысленно
 	float voltage_adc = ((float)adc_value / 1024.0f) * 5.0f;
-	float voltage_acs712 = -voltage_adc*33.0f/100.0f;
-	float current = (voltage_acs712-2.5f) / 0.200f; // 185 мВ = 1А, но в протеусе это 200 мВ на 1 А
+	float voltage_acs712 = (2.5f-voltage_adc)*33.0f/100.0f;
+	float current = voltage_acs712 / 0.200f; // 185 мВ = 1А, но в протеусе это 200 мВ на 1 А
 	int16_t current_ma = (int16_t)(current*1000.0f);
 	return current_ma;
 }
@@ -87,7 +87,6 @@ int main( void ){
 	ADCSRA = (1 << ADEN) | (1 << ADIE) | (1 << ADATE) | (1 << ADPS2) | (1 << ADSC);
 	// Разрешить прерывания
 	sei();
-	int16_t i = 100;
 	while (1){
 		int16_t current = adc2current_ma(adc_readed_value)/10;
 		print_value(current);
